@@ -271,4 +271,39 @@ public:
         }
         cout << distance[in];
     }
+    void trampoint()
+    {
+        vector<Vertex> result;
+        
+        double maximum_of_average_distances = 0;
+        for (const auto& pair : data)
+        {
+            double temp = 0;
+            int size_vector = pair.second.size();
+            for (const auto& edge : pair.second)
+            {
+                temp += edge.distance;
+            }
+            temp /= size_vector;
+            if (temp > maximum_of_average_distances) 
+            { maximum_of_average_distances = temp; }
+        }
+        cout << "Максимальное среднее удаление наблюдается у пунктов -->";
+        for (const auto& pair : data)
+        {
+            double temp = 0;
+            int size_vector = pair.second.size();
+            for (const auto& edge : pair.second)
+            {
+                temp += edge.distance;
+            }
+            temp /= size_vector;
+           
+            if (maximum_of_average_distances == temp) 
+            {
+                cout << pair.first <<"\n    ";
+                result.push_back(pair.first);
+            }
+        }
+    }
 };
