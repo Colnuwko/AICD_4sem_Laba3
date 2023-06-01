@@ -9,7 +9,7 @@ using namespace std;
 
 
 
-template<typename Vertex = int>
+template<typename Vertex>
 
 class Graph
 {
@@ -18,7 +18,7 @@ public:
     {
         Vertex out, in;
         double distance;
-        //Edge(Vertex out, Vertex in, double dis) : out(out), in(in), distance(dis) {};
+        
     };
 private:
    
@@ -46,6 +46,20 @@ public:
         else
             data.insert({ v, {} });
     }
+    bool remove_edge(const Vertex& out, const Vertex& in)
+    {
+        if (!has_vertex(out) || !has_vertex(in)) return false;
+        auto& edges = data.find(out)->second;
+        auto it = edges.begin();
+        while (it != edges.end()) {
+            if (it->out == out and it->in == in)
+            {
+                it = edges.erase(it);
+            }
+            else ++it;
+        }
+        return true;
+    }
     bool remove_vertex(const Vertex& v)
     {
         if (!has_vertex(v))
@@ -55,6 +69,19 @@ public:
         }
         else
         {
+           
+            //просмотреть и удалить  все ребра которые вход€т в эту вершину
+            for (auto& pair : data)
+            {
+                for (auto& edge : pair.second)
+                {
+                    if (edge.in == v)
+                    {
+                        cout<< "удаление";
+                        remove_edge(edge.out, v);
+                    }
+                }
+            }
             data.erase(v);
             return true;
         }
@@ -120,20 +147,7 @@ public:
         }
         cout << endl;
     }
-    bool remove_edge(const Vertex& out, const Vertex& in)
-    {
-        if (!has_vertex(out) || !has_vertex(in)) return false;
-        auto& edges = data.find(out)->second;
-        auto it = edges.begin();
-        while (it != edges.end()) {
-            if (it->out == out and it->in == in)
-            {
-                it = edges.erase(it);
-            }
-            else ++it;
-        }
-        return true;
-    }
+  
     bool remove_edge(const Vertex& out, const Vertex& in, const double & dis)
     {
         if (!has_vertex(out) || !has_vertex(in)) return false;
@@ -183,8 +197,11 @@ public:
     }
     vector<Edge> edges(const Vertex& out) const
     {
-        if (!has_vertex(out))throw logic_error("Ќет такой вершины");
-        auto i = data.find(out)->second;
+        if (!has_vertex(out))
+        {
+            throw logic_error("Ќет такой вершины");
+        }
+        
         return(data.find(out)->second);
     }
     size_t order() const
@@ -198,12 +215,10 @@ public:
     }//степень
     vector<Vertex>  walk(const Vertex& start_vertex)const 
     {
-        //vector<Vertex> result;
         vector<Vertex> used;
         used.push_back(start_vertex); // массив использованных
         queue<int> q;
         q.push(start_vertex);
-        //result.push_back(start_vertex);
         while (!q.empty()) {
             auto ver = q.front();
             vector<Edge> g = edges(ver);
@@ -215,7 +230,7 @@ public:
                 {
                     used.push_back(v);
                     q.push(v);
-                    //result.push_back(v);
+                    
                 }
             }
         }
@@ -226,35 +241,17 @@ public:
         }
         return used;
     }
-    vector<Edge> Algoritm_of_Belman_ford(const Vertex& out, const Vertex& in) const
+    void Algoritm_of_Belman_ford(const Vertex& out, const Vertex& in) const
     {
         if (!has_vertex(out) || !has_vertex(in))throw std::invalid_argument("¬ершина не найдена!");
-        vector<Edge> resullt;
-       /* vector<Edge> temp;*/
         std::unordered_map<Vertex, double> distance;
         std::unordered_map<Vertex, Edge> ancestors;
-        vector<Edge> parent;
-        parent.push_back({ out,out,0 });
-        //cout << parent[0].out << parent[0].in << parent[0].distance;
         for (auto& item : data)
         {
             distance[item.first] = 100000000000;
             distance[out] = 0;
         }
-        //auto vec = vertices();
-        //for (auto& k : vec)
-        //{
-
-        //    for (auto& j : edges(k))
-        //    {
-        //        //cout << j.in;
-        //        temp.push_back(j);
-        //    }
-        //}
-        //for (auto& i : temp)
-        //{
-        //    cout << i.out << i.in << i.distance << "  ";
-        //}
+        
         for (size_t i = 0; i < order() - 1; i++)
         {
             for (const auto& pair : data)
@@ -269,6 +266,7 @@ public:
                 }
             }
         }
+        
         cout << distance[in];
     }
     void trampoint()
@@ -276,6 +274,7 @@ public:
         vector<Vertex> result;
         
         double maximum_of_average_distances = 0;
+        
         for (const auto& pair : data)
         {
             double temp = 0;
@@ -285,25 +284,26 @@ public:
                 temp += edge.distance;
             }
             temp /= size_vector;
-            if (temp > maximum_of_average_distances) 
-            { maximum_of_average_distances = temp; }
+            if (temp >= maximum_of_average_distances) 
+            {
+                
+                if (temp == maximum_of_average_distances)
+                {
+                    result.push_back(pair.first);
+                    
+                }
+                else 
+                {
+                    result.clear();
+                    result.push_back(pair.first);
+                }
+                maximum_of_average_distances = temp;
+            }
         }
-        cout << "ћаксимальное среднее удаление наблюдаетс€ у пунктов -->";
-        for (const auto& pair : data)
+        cout << "ћаксимальное среднее удаление наблюдаетс€ у пунктов --> \n";
+        for (auto& i : result)
         {
-            double temp = 0;
-            int size_vector = pair.second.size();
-            for (const auto& edge : pair.second)
-            {
-                temp += edge.distance;
-            }
-            temp /= size_vector;
-           
-            if (maximum_of_average_distances == temp) 
-            {
-                cout << pair.first <<"\n    ";
-                result.push_back(pair.first);
-            }
+            cout << i << " ";
         }
     }
 };
