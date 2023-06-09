@@ -241,7 +241,7 @@ public:
         }
         return used;
     }
-    void Algoritm_of_Belman_ford(const Vertex& out, const Vertex& in) const
+    vector<Vertex> Algoritm_of_Belman_ford(const Vertex& out, const Vertex& in) const
     {
         if (!has_vertex(out) || !has_vertex(in))throw std::invalid_argument("Вершина не найдена!");
         std::unordered_map<Vertex, double> distance;
@@ -293,6 +293,7 @@ public:
             cout << i;
         }   
         cout <<"\nРастояние - "<< distance[in] << "\n";
+        return path;
     }
     void trampoint()
     {
