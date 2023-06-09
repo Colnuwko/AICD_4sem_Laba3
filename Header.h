@@ -246,6 +246,7 @@ public:
         if (!has_vertex(out) || !has_vertex(in))throw std::invalid_argument("Вершина не найдена!");
         std::unordered_map<Vertex, double> distance;
         std::unordered_map<Vertex, Edge> ancestors;
+        vector<Vertex> path;
         for (auto& item : data)
         {
             distance[item.first] = 100000000000;
@@ -262,12 +263,36 @@ public:
                     {
                         distance[edge.in] = distance[edge.out] + edge.distance;
                         ancestors[edge.in] = edge;
+                        
                     }
                 }
             }
+           
         }
-        
-        cout << distance[in];
+        //проверка на отрциательный цикл
+        for (auto j : data)
+        {
+            for (auto& i : j.second)
+            {
+                if (distance[i.out] + i.distance < distance[i.in])
+                {
+                    throw logic_error("Ну вы конеечно даааа, отрицательный путь нельзя делать!");
+                }
+            }
+        }
+        Vertex current = in;
+        while (current != out)
+        {
+            path.push_back(current);
+            current = ancestors[current].out;
+        }
+        path.push_back(out);
+        std::reverse(path.begin(), path.end());
+        for (auto& i : path)
+        {
+            cout << i;
+        }   
+        cout <<"\nРастояние - "<< distance[in] << "\n";
     }
     void trampoint()
     {
